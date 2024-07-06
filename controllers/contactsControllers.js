@@ -1,11 +1,56 @@
-import contactsService from "../services/contactsServices.js";
+import ctrlWrapper from "../decorators/ctrlWrapper.js";
+import HttpError from "../helpers/HttpError.js";
+import * as contactsServices from "../services/contactsServices.js";
 
-export const getAllContacts = (req, res) => {};
+const getAllContacts = async (req, res, next) => {
+  const contacts = await contactsServices.listContacts();
+  res.json({
+    status: 200,
+    message: "Contacts get successfully",
+    contacts,
+  });
+};
 
-export const getOneContact = (req, res) => {};
+const getOneContact = async (req, res, next) => {
+  const contact = await contactsServices.getContactById(req.params.id);
+  if (!contact) {
+    throw HttpError(404, "Not found");
+  }
+  res.status(200).json(contact);
+};
 
-export const deleteContact = (req, res) => {};
+const deleteContact = async (req, res, next) => {
+  const removedContact = await contactsServices.removeContact(req.params.id);
+  if (!removedContact) {
+    throw HttpError(404, "Not found");
+  }
+  res.status(200).json(removedContact);
+};
 
-export const createContact = (req, res) => {};
+const createContact = async (req, res, next) => {
+  const { name, email, phone } = req.body;
+  const newContact = await contactsServices.addContact(name, email, phone);
+  res.status(201).json(newContact);
+};
 
-export const updateContact = (req, res) => {};
+const updateContact = async (req, res, next) => {
+  const { id } = req.params;
+  const updatedContact = await contactsServices.updateContact(id, req.body);
+  if (!updatedContact) {
+    throw HttpError(404, "Not found");
+  }
+  res.status(200).json(updatedContact);
+};
+export default {
+  getAllContacts: ctrlWrapper(getAllContacts),
+  getOneContact: ctrlWrapper(getOneContact),
+  deleteContact: ctrlWrapper(deleteContact),
+  createContact: ctrlWrapper(createContact),
+  updateContact: ctrlWrapper(updateContact),
+};
+
+// hISB6bG5b5WqjCsS
+
+// EQfMvTfqWJ0dCk6T
+
+// mongodb+srv://lubaparfyonova:hISB6bG5b5WqjCsS@cluster0.wob74om.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
