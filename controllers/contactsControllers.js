@@ -6,7 +6,6 @@ import { createContactSchema } from "../validation/contactsSchemas.js";
 
 const getAllContacts = async (req, res, next) => {
   const contacts = await contactsServices.getContacts();
-  console.log(contacts);
   res.json({
     status: 200,
     message: "Contacts get successfully",
