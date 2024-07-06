@@ -17,3 +17,9 @@ const initMongodbConnection = async () => {
   }
 };
 export default initMongodbConnection;
+
+// hISB6bG5b5WqjCsS
+
+// EQfMvTfqWJ0dCk6T
+
+// mongodb+srv://lubaparfyonova:hISB6bG5b5WqjCsS@cluster0.wob74om.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0

@@ -1,9 +1,12 @@
 import ctrlWrapper from "../decorators/ctrlWrapper.js";
 import HttpError from "../helpers/HttpError.js";
-// import * as contactsServices from "../services/contactsServices.js";
+// import { getContacts } from "../services/contactsServices.js";
+import * as contactsServices from "../services/contactsServices.js";
+import { createContactSchema } from "../validation/contactsSchemas.js";
 
 const getAllContacts = async (req, res, next) => {
-  const contacts = await getAllContacts();
+  const contacts = await contactsServices.getContacts();
+  console.log(contacts);
   res.json({
     status: 200,
     message: "Contacts get successfully",
@@ -12,9 +15,10 @@ const getAllContacts = async (req, res, next) => {
 };
 
 const getOneContact = async (req, res, next) => {
-  const contact = await contactsServices.getContactById(req.params.id);
+  const { id: _id } = req.params;
+  const contact = await contactsServices.getContactById({ _id });
   if (!contact) {
-    throw HttpError(404, "Not found");
+    throw HttpError(404, `Const with id ${_id} not found`);
   }
   res.status(200).json(contact);
 };
@@ -28,9 +32,12 @@ const deleteContact = async (req, res, next) => {
 };
 
 const createContact = async (req, res, next) => {
-  const { name, email, phone } = req.body;
-  const newContact = await contactsServices.addContact(name, email, phone);
-  res.status(201).json(newContact);
+  const data = await contactsServices.addContact(req.body);
+  res.status(201).json({
+    status: 201,
+    message: `Contact create successfully`,
+    data,
+  });
 };
 
 const updateContact = async (req, res, next) => {
@@ -39,7 +46,26 @@ const updateContact = async (req, res, next) => {
   if (!updatedContact) {
     throw HttpError(404, "Not found");
   }
-  res.status(200).json(updatedContact);
+  res.status(200).json({
+    status: 201,
+    message: `Contact was updated successfully`,
+    updatedContact,
+  });
+};
+const updateStatusContact = async (req, res, next) => {
+  const { id } = req.params;
+  const updatedContact = await contactsServices.updateStatusContact(
+    id,
+    req.body
+  );
+  if (!updatedContact) {
+    throw HttpError(404, "Not found");
+  }
+  res.status(200).json({
+    status: 201,
+    message: `Contact-status was updated successfully`,
+    updatedContact,
+  });
 };
 export default {
   getAllContacts: ctrlWrapper(getAllContacts),
@@ -47,10 +73,5 @@ export default {
   deleteContact: ctrlWrapper(deleteContact),
   createContact: ctrlWrapper(createContact),
   updateContact: ctrlWrapper(updateContact),
+  updateStatusContact: ctrlWrapper(updateStatusContact),
 };
-
-// hISB6bG5b5WqjCsS
-
-// EQfMvTfqWJ0dCk6T
-
-// mongodb+srv://lubaparfyonova:hISB6bG5b5WqjCsS@cluster0.wob74om.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
