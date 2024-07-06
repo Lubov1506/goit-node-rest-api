@@ -20,15 +20,24 @@ const getOneContact = async (req, res, next) => {
   if (!contact) {
     throw HttpError(404, `Const with id ${_id} not found`);
   }
-  res.status(200).json(contact);
+  res.status(200).json({
+    status: 201,
+    message: `Contact got successfully`,
+    contact,
+  });
 };
 
 const deleteContact = async (req, res, next) => {
-  const removedContact = await contactsServices.removeContact(req.params.id);
+  const { id: _id } = req.params;
+  const removedContact = await contactsServices.removeContact({ _id });
   if (!removedContact) {
     throw HttpError(404, "Not found");
   }
-  res.status(200).json(removedContact);
+  res.status(200).json({
+    status: 201,
+    message: `Contact deleted successfully`,
+    removedContact,
+  });
 };
 
 const createContact = async (req, res, next) => {
@@ -41,8 +50,11 @@ const createContact = async (req, res, next) => {
 };
 
 const updateContact = async (req, res, next) => {
-  const { id } = req.params;
-  const updatedContact = await contactsServices.updateContact(id, req.body);
+  const { id: _id } = req.params;
+  const updatedContact = await contactsServices.updateContact(
+    { _id },
+    req.body
+  );
   if (!updatedContact) {
     throw HttpError(404, "Not found");
   }
@@ -53,9 +65,9 @@ const updateContact = async (req, res, next) => {
   });
 };
 const updateStatusContact = async (req, res, next) => {
-  const { id } = req.params;
+  const { id: _id } = req.params;
   const updatedContact = await contactsServices.updateStatusContact(
-    id,
+    { _id },
     req.body
   );
   if (!updatedContact) {
