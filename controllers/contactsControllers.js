@@ -1,9 +1,9 @@
 import ctrlWrapper from "../decorators/ctrlWrapper.js";
 import HttpError from "../helpers/HttpError.js";
-import * as contactsServices from "../services/contactsServices.js";
+// import * as contactsServices from "../services/contactsServices.js";
 
 const getAllContacts = async (req, res, next) => {
-  const contacts = await contactsServices.listContacts();
+  const contacts = await getAllContacts();
   res.json({
     status: 200,
     message: "Contacts get successfully",

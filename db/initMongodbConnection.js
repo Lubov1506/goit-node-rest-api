@@ -13,6 +13,7 @@ const initMongodbConnection = async () => {
     console.log("successful connection to MongoDB");
   } catch (err) {
     console.log(`Connection error ${err.message}`);
+    process.exit(1);
   }
 };
 export default initMongodbConnection;
