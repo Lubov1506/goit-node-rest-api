@@ -2,8 +2,10 @@ import express from "express";
 import morgan from "morgan";
 import cors from "cors";
 import contactsRouter from "./routes/contactsRouter.js";
+import env from "./utils/env.js";
 
 const startServer = () => {
+  const port = Number(env("PORT", 3000));
   const app = express();
   app.use(morgan("tiny"));
   app.use(cors());
@@ -20,8 +22,8 @@ const startServer = () => {
     res.status(status).json({ message });
   });
 
-  app.listen(3000, () => {
-    console.log("Server is running. Use our API on port: 3000");
+  app.listen(port, () => {
+    console.log(`Server is running. Use our API on port: ${port}`);
   });
 };
 export default startServer;
