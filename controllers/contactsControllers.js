@@ -1,6 +1,5 @@
 import ctrlWrapper from "../decorators/ctrlWrapper.js";
-import HttpError from "../helpers/HttpError.js";
-// import { getContacts } from "../services/contactsServices.js";
+import HttpError from "../utils/HttpError.js";
 import * as contactsServices from "../services/contactsServices.js";
 import { createContactSchema } from "../validation/contactsSchemas.js";
 
