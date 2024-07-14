@@ -7,9 +7,10 @@ import {
 import isValidId from "../middlewares/isValidId.js";
 import validateBody from "../decorators/validateBody.js";
 import { isEmptyBody } from "../middlewares/isEmptyBody.js";
-createContactSchema;
-const contactsRouter = express.Router();
+import { authenticate } from "../middlewares/authenticate.js";
 
+const contactsRouter = express.Router();
+contactsRouter.use(authenticate);
 contactsRouter.get("/", contactsControllers.getAllContacts);
 
 contactsRouter.get("/:id", isValidId, contactsControllers.getOneContact);

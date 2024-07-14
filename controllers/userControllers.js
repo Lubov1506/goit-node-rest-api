@@ -2,6 +2,9 @@ import ctrlWrapper from "../decorators/ctrlWrapper.js";
 import HttpError from "../utils/HttpError.js";
 import * as userServices from "../services/userServices.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+
+const { JWT_SECRET } = process.env;
 
 const register = async (req, res) => {
   const { email, password } = req.body;
@@ -34,9 +37,16 @@ const login = async (req, res) => {
   if (!passwordCompare) {
     throw HttpError(401, "Email or password is wrong");
   }
-  const token = "111-222-333";
-  res.json({
+
+  const { _id: id } = user;
+  const payload = { id };
+  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "24h" });
+  res.status(200).json({
     token,
+    user: {
+      email: user.email,
+      subscription: user.subscription,
+    },
   });
 };
 export default {
