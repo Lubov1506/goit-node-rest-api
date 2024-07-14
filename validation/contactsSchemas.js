@@ -17,6 +17,7 @@ export const createContactSchema = Joi.object({
       "string.pattern.base": "Phone must contain only numbers",
       "string.length": "Phone must be exactly 9 digits",
     }),
+  favorite: Joi.boolean(),
 });
 
 export const updateContactSchema = Joi.object({
@@ -33,6 +34,7 @@ export const updateContactSchema = Joi.object({
     .messages({
       "string.pattern.base": "Phone must contain only numbers",
     }),
+  favorite: Joi.boolean(),
 })
   .or("name", "email", "phone")
   .messages({
