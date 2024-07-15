@@ -6,6 +6,7 @@ import {
   userLoginSchema,
 } from "../validation/userSchemas.js";
 import { validateAuthBody } from "../middlewares/validateAuthBody.js";
+import { authenticate } from "../middlewares/authenticate.js";
 
 const userRouter = Router();
 userRouter.post(
@@ -20,4 +21,8 @@ userRouter.post(
   validateAuthBody(userLoginSchema),
   userController.login
 );
+
+userRouter.post("/logout", authenticate, userController.logout);
+userRouter.get("/current", authenticate, userController.getCurrentUser);
+
 export default userRouter;

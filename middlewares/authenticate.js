@@ -7,11 +7,9 @@ console.log(JWT_SECRET);
 
 export const authenticate = async (req, res, next) => {
   const { authorization } = req.headers;
-  console.log(authorization);
   if (!authorization) {
     return next(HttpError(401, "Authorization header not found"));
   }
-  console.log(authorization);
   const [bearer, token] = authorization.split(" ");
   if (bearer !== "Bearer") {
     return next(HttpError(401, "Not authorized"));
@@ -23,6 +21,7 @@ export const authenticate = async (req, res, next) => {
     if (!user) {
       return next(HttpError(401, "Not authorized"));
     }
+    req.user = user;
     next();
   } catch (error) {
     next(HttpError(401, error.message));

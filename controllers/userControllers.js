@@ -41,6 +41,9 @@ const login = async (req, res) => {
   const { _id: id } = user;
   const payload = { id };
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "24h" });
+
+  await userServices.updateUser({ _id: id }, { token });
+
   res.status(200).json({
     token,
     user: {
@@ -49,7 +52,25 @@ const login = async (req, res) => {
     },
   });
 };
+
+const logout = async (req, res) => {
+  const { _id } = req.user;
+  const user = await userServices.updateUser({ _id }, { token: "" });
+  if (!user) {
+    throw HttpError(401, "Not authorized");
+  }
+  res.status(204).send();
+};
+const getCurrentUser = async (req, res) => {
+  const { email, subscription } = req.user;
+  res.json({
+    email,
+    subscription,
+  });
+};
 export default {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
+  logout: ctrlWrapper(logout),
+  getCurrentUser: ctrlWrapper(getCurrentUser),
 };
