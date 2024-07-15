@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken";
 import { findUser } from "../services/userServices.js";
 import "dotenv/config";
 const { JWT_SECRET } = process.env;
-console.log(JWT_SECRET);
 
 export const authenticate = async (req, res, next) => {
   const { authorization } = req.headers;

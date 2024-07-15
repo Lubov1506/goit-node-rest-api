@@ -9,7 +9,7 @@ const { JWT_SECRET } = process.env;
 const register = async (req, res) => {
   const { email, password } = req.body;
   const user = await userServices.findUser({ email });
-  console.log(email, user);
+
   if (user) {
     throw HttpError(409, "Email in use");
   }
