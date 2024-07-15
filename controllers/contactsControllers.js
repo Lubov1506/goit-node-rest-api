@@ -8,6 +8,12 @@ const getAllContacts = async (req, res, next) => {
   const settings = { page, limit };
   const { _id: owner } = req.user;
   const filter = { owner };
+
+  const { favorite } = req.query;
+  if (favorite !== undefined) {
+    filter.favorite = favorite === "true";
+  }
+
   const contacts = await contactsServices.getContacts({ filter, settings });
 
   res.json({

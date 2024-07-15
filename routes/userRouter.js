@@ -24,5 +24,10 @@ userRouter.post(
 
 userRouter.post("/logout", authenticate, userController.logout);
 userRouter.get("/current", authenticate, userController.getCurrentUser);
-
+userRouter.patch(
+  "/",
+  authenticate,
+  isEmptyBody,
+  userController.updateSubscription
+);
 export default userRouter;
