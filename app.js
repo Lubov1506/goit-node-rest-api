@@ -21,7 +21,7 @@ const startServer = () => {
   app.use(notFoundHandler);
   app.use(errorHandler);
 
-  app.listen(port, () => {
+  return app.listen(port, () => {
     console.log(`Server is running. Use our API on port: ${port}`);
   });
 };
