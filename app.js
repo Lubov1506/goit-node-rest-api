@@ -6,7 +6,7 @@ import env from "./utils/env.js";
 import notFoundHandler from "./middlewares/notFoundHandler.js";
 import errorHandler from "./middlewares/errorHandler.js";
 import userRouter from "./routes/userRouter.js";
-
+import path from "node:path";
 const startServer = () => {
   const port = Number(env("PORT", 3000));
   const app = express();
@@ -14,6 +14,7 @@ const startServer = () => {
   app.use(cors());
   app.use(express.json());
 
+  app.use(express.static(path.resolve("public")));
   app.use("/api/users", userRouter);
   app.use("/api/contacts", contactsRouter);
 
