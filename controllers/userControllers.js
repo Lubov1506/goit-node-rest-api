@@ -3,6 +3,7 @@ import HttpError from "../utils/HttpError.js";
 import * as userServices from "../services/userServices.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { validSubscriptions } from "../constants/user-constants.js";
 
 const { JWT_SECRET } = process.env;
 
@@ -68,9 +69,34 @@ const getCurrentUser = async (req, res) => {
     subscription,
   });
 };
+export const updateSubscription = async (req, res, next) => {
+  const { _id } = req.user;
+  const { subscription } = req.body;
+
+  if (!validSubscriptions.includes(subscription)) {
+    return next(HttpError(400, "Invalid subscription value"));
+  }
+
+  try {
+    const updatedUser = await userServices.updateUser(
+      { _id },
+      { subscription }
+    );
+    if (!updatedUser) {
+      throw HttpError(404, "User not found");
+    }
+    res.status(200).json({
+      message: "Subscription updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    next(HttpError(500, error.message));
+  }
+};
 export default {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
   logout: ctrlWrapper(logout),
   getCurrentUser: ctrlWrapper(getCurrentUser),
+  updateSubscription: ctrlWrapper(updateSubscription),
 };
