@@ -7,6 +7,7 @@ import {
 } from "../validation/userSchemas.js";
 import { validateAuthBody } from "../middlewares/validateAuthBody.js";
 import { authenticate } from "../middlewares/authenticate.js";
+import upload from "../middlewares/upload.js";
 
 const userRouter = Router();
 userRouter.post(
@@ -29,5 +30,11 @@ userRouter.patch(
   authenticate,
   isEmptyBody,
   userController.updateSubscription
+);
+userRouter.patch(
+  "/avatars",
+  authenticate,
+  upload.single("avatar"),
+  userController.updateAvatar
 );
 export default userRouter;

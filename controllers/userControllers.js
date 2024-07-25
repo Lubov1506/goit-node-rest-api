@@ -4,8 +4,13 @@ import * as userServices from "../services/userServices.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { validSubscriptions } from "../constants/user-constants.js";
+import gravatar from "gravatar";
+import jimp from "jimp";
+import path from "node:path";
+import fs from "fs";
 
 const { JWT_SECRET } = process.env;
+const avatarsPath = path.resolve("public", "avatars");
 
 const register = async (req, res) => {
   const { email, password } = req.body;
@@ -19,6 +24,7 @@ const register = async (req, res) => {
   const newUser = await userServices.register({
     ...req.body,
     password: hashPassword,
+    avatarURL: gravatar.url(email),
   });
   res.status(201).json({
     user: {
@@ -62,6 +68,7 @@ const logout = async (req, res) => {
   }
   res.status(204).send();
 };
+
 const getCurrentUser = async (req, res) => {
   const { email, subscription } = req.user;
   res.json({
@@ -69,7 +76,8 @@ const getCurrentUser = async (req, res) => {
     subscription,
   });
 };
-export const updateSubscription = async (req, res, next) => {
+
+const updateSubscription = async (req, res, next) => {
   const { _id } = req.user;
   const { subscription } = req.body;
 
@@ -93,10 +101,53 @@ export const updateSubscription = async (req, res, next) => {
     next(HttpError(500, error.message));
   }
 };
+
+const updateAvatar = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      throw HttpError(400, "No file uploaded");
+    }
+
+    const { path: oldPath, filename } = req.file;
+
+    if (!oldPath || !filename) {
+      throw HttpError(400, "File path or filename is missing");
+    }
+
+    const img = await jimp.read(oldPath);
+    await img.resize(250, 250);
+
+    const newPath = path.join(avatarsPath, filename);
+    await img.writeAsync(newPath);
+
+    const avatar = path.join("avatars", filename);
+    const { _id: owner } = req.user;
+    const updatedUser = await userServices.updateAvatar({
+      filter: owner,
+      data: { avatarURL: avatar },
+    });
+
+    if (!updatedUser) {
+      throw HttpError(404, "User not found");
+    }
+
+    res.status(201).json({
+      status: 201,
+      message: `Avatar updated successfully`,
+      updatedUser,
+    });
+  } catch (error) {
+    if (req.file && req.file.path) {
+      await fs.unlink(req.file.path);
+    }
+    next(error);
+  }
+};
 export default {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
   logout: ctrlWrapper(logout),
   getCurrentUser: ctrlWrapper(getCurrentUser),
   updateSubscription: ctrlWrapper(updateSubscription),
+  updateAvatar: ctrlWrapper(updateAvatar),
 };
