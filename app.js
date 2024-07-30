@@ -2,11 +2,12 @@ import express from "express";
 import morgan from "morgan";
 import cors from "cors";
 import contactsRouter from "./routes/contactsRouter.js";
-import env from "./utils/env.js";
 import notFoundHandler from "./middlewares/notFoundHandler.js";
 import errorHandler from "./middlewares/errorHandler.js";
 import userRouter from "./routes/userRouter.js";
 import path from "node:path";
+import env from "./utils/env.js";
+
 const startServer = () => {
   const port = Number(env("PORT", 3000));
   const app = express();

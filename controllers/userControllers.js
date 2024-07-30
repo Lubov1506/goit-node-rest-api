@@ -8,8 +8,10 @@ import gravatar from "gravatar";
 import jimp from "jimp";
 import path from "node:path";
 import fs from "fs";
+import { nanoid } from "nanoid";
+import sendEmail from "../utils/sendEmail.js";
 
-const { JWT_SECRET } = process.env;
+const { JWT_SECRET, BASE_URL } = process.env;
 const avatarsPath = path.resolve("public", "avatars");
 
 const register = async (req, res) => {
@@ -21,16 +23,66 @@ const register = async (req, res) => {
   }
 
   const hashPassword = await bcrypt.hash(password, 10);
+  const verificationCode = nanoid();
+
   const newUser = await userServices.register({
     ...req.body,
     password: hashPassword,
     avatarURL: gravatar.url(email),
+    verificationCode,
   });
+
+  const verifyEmail = {
+    to: email,
+    subject: "Verify email",
+    html: `<a target="_blank" href="${BASE_URL}/api/users/verify/${verificationCode}">Click verify email</a>`,
+  };
+
+  await sendEmail(verifyEmail);
+
   res.status(201).json({
     user: {
       email: newUser.email,
       subscription: newUser.subscription,
     },
+  });
+};
+const verify = async (req, res) => {
+  const { verificationCode } = req.params;
+  const user = await authServices.findUser({ verificationCode });
+  if (!user) {
+    throw HttpError(400, "User not found or already verify");
+  }
+
+  await userServices.updateUser(
+    { _id: user._id },
+    { verify: true, verificationCode: "" }
+  );
+
+  res.json({
+    message: "Email verify success",
+  });
+};
+const resendVerify = async (req, res) => {
+  const { email } = req.body;
+  const user = await userServices.findUser({ email });
+  if (!user) {
+    throw HttpError(404, "Email not found");
+  }
+  if (user.verify) {
+    throw HttpError(400, "Email already verify");
+  }
+
+  const verifyEmail = {
+    to: email,
+    subject: "Verify email",
+    html: `<a target="_blank" href="${BASE_URL}/api/auth/verify/${user.verificationCode}">Click verify email</a>`,
+  };
+
+  await sendEmail(verifyEmail);
+
+  res.json({
+    message: "Verify email resend success",
   });
 };
 
@@ -39,6 +91,10 @@ const login = async (req, res) => {
   const user = await userServices.findUser({ email });
   if (!user) {
     throw HttpError(401, "Email or password is wrong");
+  }
+
+  if (!user.verify) {
+    throw HttpError(401, "Email not verify");
   }
   const passwordCompare = await bcrypt.compare(password, user.password);
   if (!passwordCompare) {
@@ -143,6 +199,7 @@ const updateAvatar = async (req, res, next) => {
     next(error);
   }
 };
+
 export default {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
@@ -150,4 +207,6 @@ export default {
   getCurrentUser: ctrlWrapper(getCurrentUser),
   updateSubscription: ctrlWrapper(updateSubscription),
   updateAvatar: ctrlWrapper(updateAvatar),
+  verify: ctrlWrapper(verify),
+  resendVerify: ctrlWrapper(resendVerify),
 };
