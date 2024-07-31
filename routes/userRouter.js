@@ -4,6 +4,7 @@ import { isEmptyBody } from "../middlewares/isEmptyBody.js";
 import {
   userRegisterSchema,
   userLoginSchema,
+  userEmailSchema,
 } from "../validation/userSchemas.js";
 import { validateAuthBody } from "../middlewares/validateAuthBody.js";
 import { authenticate } from "../middlewares/authenticate.js";
@@ -16,6 +17,14 @@ userRouter.post(
   validateAuthBody(userRegisterSchema),
   userController.register
 );
+
+userRouter.get("/verify/:verificationCode", userController.verify);
+userRouter.post(
+  "/verify",
+  validateAuthBody(userEmailSchema),
+  userController.resendVerify
+);
+
 userRouter.post(
   "/login",
   isEmptyBody,
