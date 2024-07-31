@@ -11,8 +11,8 @@ import fs from "fs";
 import { nanoid } from "nanoid";
 import sendEmail from "../utils/sendEmail.js";
 
-const { JWT_SECRET, BASE_URL } = process.env;
 const avatarsPath = path.resolve("public", "avatars");
+const { JWT_SECRET, BASE_URL } = process.env;
 
 const register = async (req, res) => {
   const { email, password } = req.body;
@@ -37,7 +37,7 @@ const register = async (req, res) => {
     subject: "Verify email",
     html: `<a target="_blank" href="${BASE_URL}/api/users/verify/${verificationCode}">Click verify email</a>`,
   };
-
+  console.log(verifyEmail);
   await sendEmail(verifyEmail);
 
   res.status(201).json({
@@ -49,7 +49,7 @@ const register = async (req, res) => {
 };
 const verify = async (req, res) => {
   const { verificationCode } = req.params;
-  const user = await authServices.findUser({ verificationCode });
+  const user = await userServices.findUser({ verificationCode });
   if (!user) {
     throw HttpError(400, "User not found or already verify");
   }
